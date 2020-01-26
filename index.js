@@ -19,30 +19,8 @@ db.on('error', function (err) {
 });
 
 app.set('port', (process.env.PORT || 5000))
-app.use(express.static(__dirname + '/public'))
 
-app.post('/', function (request, response) {
-  const user_name = request.body.user_name;
-  const bid_price = request.body.bid_price;
-  //const bid_date = request.body.bid_date;
-  //const deadline = request.body.deadline;
-  //response.json({ user_name: user_name, bid_price: bid_price, bid_date: bid_date, deadline: deadline })
-
-  let bid = new Bid();
-  bid.user_name = user_name;
-  bid.bid_price = bid_price;
-  bid.bid_date = new Date();
-  bid.deadline = new Date();
-  bid.save(function (err) {
-    if (err) {
-      console.log(err);
-      return;
-    } else {
-      response.json({ message: "İşlem Başarılı" });
-    }
-  });
-});
-
+//Teklif verilen fiyatları güncellemek için kullanılmaktadır.
 app.post('/:id', function (request, response) {
   let bid = {};
   bid.bid_price = request.body.bid_price;
@@ -58,18 +36,16 @@ app.post('/:id', function (request, response) {
     }
   });
 });
-
+//İlk çalıştırılacağı ortamarda kaydedilen ilk verilerdir.
 app.get('/add', function (request, response) {
   const today = new Date()
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-
   let bid = new bidModel();
   bid.user_name = "ali";
   bid.bid_price = 0;
   bid.bid_date = new Date();
   bid.deadline = tomorrow;
-
   bid.save(function (error) {
     if (error) {
       console.log(error);
@@ -80,7 +56,6 @@ app.get('/add', function (request, response) {
       bid.bid_price = 0;
       bid.bid_date = new Date();
       bid.deadline = tomorrow;
-
       bid.save(function (error) {
         if (error) {
           console.log(error);
@@ -91,7 +66,6 @@ app.get('/add', function (request, response) {
           bid.bid_price = 0;
           bid.bid_date = new Date();
           bid.deadline = tomorrow;
-
           bid.save(function (error) {
             if (error) {
               console.log(error);
@@ -105,7 +79,8 @@ app.get('/add', function (request, response) {
     }
   });
 });
-
+//Uygulamada yeni bir açık artırma yapıldığında çağrılan 
+//metodun içerisinde teklifler 0 olarak güncellenir.
 app.get('/delete', function (request, response) {
 
   const today = new Date()
@@ -132,7 +107,7 @@ app.get('/delete', function (request, response) {
     }
   });
 });
-
+//Kaydedilen verilerden sonra çağrılan metoddur. Verileri yazar.
 app.get('/', function (request, response) {
   Bid.find({}, function (error, bids) {
     if (error) {
